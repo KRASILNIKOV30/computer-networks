@@ -10,79 +10,52 @@ struct ServerMode
 	uint16_t port;
 };
 
-inline int Calculate(const char sign, std::vector<int> const& numbers)
+namespace
 {
-	int result;
-
-	if (sign == '+')
-	{
-		result = std::reduce(numbers.begin(), numbers.end(), 0, std::plus());
-	}
-	else if (sign == '-')
-	{
-		result = std::reduce(numbers.begin() + 1, numbers.end(), numbers[0], std::minus());
-	}
-	else
-	{
-		throw std::runtime_error("Unknown sign");
-	}
-
-	return result;
+    const std::string serverName = "Server of Ivan";
+    const int serverNumber = 50;
 }
 
-inline int CalculateCommand(const std::string& command)
+inline bool HandleRequest(Socket& clientSocket, std::string const& message)
 {
-	auto stream = std::istringstream(command);
-	char sign;
-	stream >> sign;
-	std::vector<int> numbers;
-	int number;
-	while (stream >> number)
-	{
-		numbers.push_back(number);
-	}
+    const auto delPos = message.find(DELIMITER);
+    assert((delPos != std::string::npos));
+    const auto clientName = message.substr(0, delPos);
+    int clientNumber = std::stoi(message.substr(delPos + 1));
 
-	if (numbers.empty())
-	{
-		throw std::runtime_error("no numbers in command");
-	}
+    if (clientNumber < 1 || clientNumber > 100)
+    {
+        return true;
+    }
 
-	if (!stream.eof())
-	{
-		throw std::runtime_error("invalid command");
-	}
+    std::cout << "Client name: " << clientName << std::endl;
+    std::cout << "Server name: " << serverName << std::endl;
+    std::cout << "Client number: " << clientNumber << std::endl;
+    std::cout << "Server number: " << serverNumber << std::endl;
+    std::cout << "Sum: " << clientNumber + serverNumber << std::endl;
+    std::cout << "-------------------------" << std::endl;
 
-	return Calculate(sign, numbers);
+	const std::string response = serverName + DELIMITER += std::to_string(serverNumber);
+	clientSocket.Send(response.data(), response.size(), 0);
+
+    return false;
 }
 
-inline void HandleRequest(Socket& clientSocket, std::string const& command)
-{
-	int result;
-	try
-	{
-		result = CalculateCommand(command);
-	}
-	catch (const std::exception& e)
-	{
-		const std::string errorMessage = e.what();
-		clientSocket.Send(errorMessage.data(), errorMessage.size(), 0);
-		return;
-	}
-	const auto resultStr = std::to_string(result);
-	clientSocket.Send(resultStr.data(), resultStr.size(), 0);
-}
-
-inline void HandleClient(Socket&& clientSocket)
+inline void HandleClient(Socket&& clientSocket, std::atomic_flag& stopFlag)
 {
 	char buffer[1024];
 	for (size_t bytesRead; (bytesRead = clientSocket.Read(&buffer, sizeof(buffer))) > 0;)
 	{
-		const auto command = std::string(buffer, bytesRead);
-		HandleRequest(clientSocket, command);
+		const auto message = std::string(buffer, bytesRead);
+		if (HandleRequest(clientSocket, message))
+        {
+            stopFlag.test_and_set();
+            return;
+        }
 	}
 }
 
-[[noreturn]] inline void Run(const ServerMode& mode)
+inline void Run(const ServerMode& mode)
 {
 	const sockaddr_in serverAddr{
 		.sin_family = AF_INET,
@@ -94,13 +67,14 @@ inline void HandleClient(Socket&& clientSocket)
 
 	std::cout << "Listening to the port " << mode.port << std::endl;
 
+    std::atomic_flag stopFlag = ATOMIC_FLAG_INIT;
 	std::vector<std::jthread> threads;
     threads.reserve(1024);
-	while (true)
+	while (!stopFlag.test())
 	{
 		std::cout << "Accepting" << std::endl;
 		auto clientSocket = acceptor.Accept();
 		std::cout << "Accepted" << std::endl;
-		threads.emplace_back(HandleClient, std::move(clientSocket));
+		threads.emplace_back(HandleClient, std::move(clientSocket), std::ref(stopFlag));
 	}
 }
