@@ -14,6 +14,7 @@ namespace
 {
     const std::string serverName = "Server of Ivan";
     const int serverNumber = 50;
+    const int QUEUE_SIZE = 5;
 }
 
 inline bool HandleRequest(Socket& clientSocket, std::string const& message)
@@ -63,18 +64,16 @@ inline void Run(const ServerMode& mode)
 		.sin_addr = { .s_addr = INADDR_ANY },
 	};
 
-	const Acceptor acceptor{ serverAddr, 5 };
+	const Acceptor acceptor{ serverAddr, QUEUE_SIZE };
 
 	std::cout << "Listening to the port " << mode.port << std::endl;
 
     std::atomic_flag stopFlag = ATOMIC_FLAG_INIT;
-	std::vector<std::jthread> threads;
-    threads.reserve(1024);
 	while (!stopFlag.test())
 	{
 		std::cout << "Accepting" << std::endl;
 		auto clientSocket = acceptor.Accept();
 		std::cout << "Accepted" << std::endl;
-		threads.emplace_back(HandleClient, std::move(clientSocket), std::ref(stopFlag));
+		HandleClient(std::move(clientSocket), stopFlag);
 	}
 }
