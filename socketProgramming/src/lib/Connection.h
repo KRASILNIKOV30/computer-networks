@@ -16,6 +16,7 @@ public:
 		{
 			throw std::runtime_error("Connection failed");
 		}
+        std::cout << "Connection created" << std::endl;
 	}
 
 	void Send(std::string const& message)
@@ -39,6 +40,11 @@ public:
 
 		return buffer;
 	}
+
+    ~Connection()
+    {
+        std::cout << "Connection closed" << std::endl;
+    }
 
 private:
 	FileDesc m_fd{ socket(AF_INET, SOCK_STREAM, /*protocol*/ 0) };

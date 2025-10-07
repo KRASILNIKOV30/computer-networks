@@ -2,6 +2,7 @@
 #include <functional>
 #include <netinet/in.h>
 #include <system_error>
+#include <iostream>
 #include "Socket.h"
 
 class Acceptor
