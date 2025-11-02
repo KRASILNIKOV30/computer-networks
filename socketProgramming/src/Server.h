@@ -4,6 +4,8 @@
 #include <numeric>
 #include <sstream>
 #include <thread>
+#include "../../lib/Socket.h"
+#include "../../lib/Acceptor.h"
 
 struct ServerMode
 {

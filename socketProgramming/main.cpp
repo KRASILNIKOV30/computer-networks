@@ -1,4 +1,3 @@
-#include "src/lib/Acceptor.h"
 #include "src/Client.h"
 #include "src/Server.h"
 #include <filesystem>
