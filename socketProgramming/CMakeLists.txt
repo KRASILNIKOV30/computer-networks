@@ -9,7 +9,6 @@ add_executable(socket-programming
         src/Server.h
         main.cpp
         src/constants/Constants.h
-        ../webServer/src/server.cpp
 )
 
 set_target_properties(socket-programming PROPERTIES LINKER_LANGUAGE CXX)

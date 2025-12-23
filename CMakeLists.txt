@@ -3,3 +3,4 @@ project(computer-networks)
 
 add_subdirectory(socketProgramming)
 add_subdirectory(webServer)
+add_subdirectory(smtpClient)
