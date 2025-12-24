@@ -23,13 +23,11 @@ DnsMode ParseCommandLine(int argc, char* argv[])
     mode.domain = argv[1];
     mode.recordType = argv[2];
 
-    // Преобразуем в верхний регистр для сравнения
     std::string upperType = mode.recordType;
     std::transform(upperType.begin(), upperType.end(), upperType.begin(), ::toupper);
 
     if (upperType == "A" || upperType == "AAAA" || upperType == "NS" || upperType == "CNAME" || upperType == "MX")
     {
-        // Корректный тип записи
     }
     else
     {
@@ -37,7 +35,6 @@ DnsMode ParseCommandLine(int argc, char* argv[])
                                ". Supported types: A, AAAA, NS, CNAME, MX");
     }
 
-    // Проверяем флаг отладки
     for (int i = 3; i < argc; ++i)
     {
         if (std::string(argv[i]) == "-d")
