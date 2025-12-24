@@ -10,10 +10,8 @@ class Connection
 public:
 	Connection(sockaddr_in addr, std::string const& serverAddrStr)
 	{
-		// Пробуем сначала как IPv4 адрес
 		if (inet_pton(AF_INET, serverAddrStr.c_str(), &addr.sin_addr) <= 0)
 		{
-			// Если не IPv4 адрес, пробуем как доменное имя
 			addrinfo hints{};
 			hints.ai_family = AF_INET;
 			hints.ai_socktype = SOCK_STREAM;
@@ -24,8 +22,7 @@ public:
 			{
 				throw std::runtime_error("Invalid address or address not supported: " + std::string(gai_strerror(status)));
 			}
-			
-			// Берем первый результат
+
 			if (result->ai_addrlen >= sizeof(addr))
 			{
 				addr = *reinterpret_cast<sockaddr_in*>(result->ai_addr);
