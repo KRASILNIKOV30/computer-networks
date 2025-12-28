@@ -397,7 +397,7 @@ private:
         };
 
         pushU16(id);
-        pushU16(0x0100);
+        pushU16(0x0000);
         pushU16(0x0001);
         pushU16(0x0000);
         pushU16(0x0000);
