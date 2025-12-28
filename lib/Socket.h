@@ -15,7 +15,6 @@ public:
 	size_t Read(void* buffer, const size_t length)
 	{
         auto bytesRead = m_fd.Read(buffer, length);
-        Log("Read message: ", buffer, bytesRead);
 
 		return bytesRead;
 	}
@@ -27,7 +26,6 @@ public:
 		{
 			throw std::system_error(errno, std::generic_category());
 		}
-        Log("Send message: ", buffer, len);
 
 		return result;
 	}
