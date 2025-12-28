@@ -43,7 +43,7 @@ cmake --build build
 
 1. Запустите локальный SMTP сервер:
 ```bash
-python3 smtpClient/test_smtp_server.py
+`python3 smtpClient/test_smtp_server.py`
 ```
 
 2. В отдельном терминале отправьте письмо:

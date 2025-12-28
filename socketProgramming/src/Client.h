@@ -36,11 +36,7 @@ void HandleResponse(std::string const& response, std::string const& clientNumber
 
 inline void Run(const ClientMode& mode)
 {
-	sockaddr_in serverAddr{};
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(mode.port);
-
-	Connection connection(serverAddr, mode.address);
+    Connection connection(mode.port, mode.address);
 	std::cout << "Connected to server at " << mode.address << ":" << mode.port << std::endl;
 
 	std::string number;
